@@ -24,7 +24,8 @@ type matrix struct {
 // If the matrices cannot be multiplies, an error is printed.
 func Product(m1 matrix, m2 matrix) (matrix) {
 	if (m1.rows != m2.cols) {
-		log.Println("You cannot compute the dot Product of these matrices")
+		log.Println("The dot product of these matrices is not defined,")
+		log.Println("see https://en.wikipedia.org/wiki/Dot_product for more information.")
 		os.Exit(0)
 	}
 
@@ -37,18 +38,25 @@ func Product(m1 matrix, m2 matrix) (matrix) {
 		m2 = Convert(m2)
 	}
 
-	new_len := m1.rows+m2.cols
+	new_len := m1.rows*m2.cols
 	result_data := make([]int, new_len)
 
-	for positionYdst := 0; positionYdst < m1.cols; positionYdst++ {
-		for positionXdst := 0; positionXdst < m1.rows; positionXdst++ {
-			for positionXsrc := 0; positionXsrc < m2.cols; positionXsrc++ {
-				m2shift := positionXdst * m2.rows
-				m1shift := positionYdst * m1.cols
-				dstShift := positionYdst * m1.rows
-				result_position := positionXdst+dstShift
-				result_data[result_position] += m1.data[positionXsrc+m1shift] * m2.data[positionXsrc+m2shift]
+	dstPos := 0
+	for dstYPos := 0; dstYPos < m2.cols; dstYPos++ {
+		for dstXPos := 0; dstXPos < m1.rows; dstXPos++ {
+			for row := 0; row < m1.rows; row++ {
+				for col := 0; col < m1.cols; col++ {
+					m2Pos := 0
+					if row == dstXPos {
+						m2Pos = col + (dstXPos * m2.rows)
+						m1Pos := col + (dstYPos * m1.cols)
+						term1 := m1.data[m1Pos]
+						term2 := m2.data[m2Pos]
+						result_data[dstPos] += term1 * term2
+					}
+				}
 			}
+			dstPos++
 		}
 	}
 
@@ -71,9 +79,9 @@ func PrintMatrix (m matrix) {
 // This is called by Print Matrix.
 func PrintRowMajorMatrix(m matrix) {
 	i := 0
-	for c := 0; c < m.cols; c++ {
+	for r := 0; r < m.rows; r++ {
 		fmt.Printf("[ ")
-		for r := 0; r < m.rows; r++ {
+		for c := 0; c < m.cols; c++ {
 		  fmt.Printf("%2d ", m.data[i])
 		  i++
 		}
@@ -84,11 +92,14 @@ func PrintRowMajorMatrix(m matrix) {
 // Convert converts a matrix between row_major and column major.
 func Convert(m matrix) (matrix) {
 	var result_data = make([]int,len(m.data))
-	var j = 0
-	for i := 0; i < len(m.data)/2; i++ {
-		result_data[j] = m.data[i]
-		result_data[j+1] = m.data[m.rows+i]
-		j = j+2
+	dstPos := 0
+	for col := 0; col < m.cols; col++ {
+		srcPos := 0
+		for row := 0; row < m.rows; row++ {
+			srcPos = row * m.cols + col
+			result_data[dstPos] = m.data[srcPos]
+			dstPos++
+		}
 	}
 	var ret = matrix{rows:m.rows, cols: m.cols, row_major: !m.row_major, data: result_data}
 	return ret
@@ -150,7 +161,7 @@ func WriteMatrix(m matrix, filename string) {
 	for c := 0; c < m.cols; c++ {
 		row := make([]string, m.cols)
 		for r := 0; r < m.rows; r++ {
-			row = append(row, strconv.Itoa(m.data[i]))
+			row[r] = strconv.Itoa(m.data[i])
 			i++
 		}
 		err = writer.Write(row)
@@ -170,7 +181,7 @@ func main() {
 	var m1 = ProcessFile(filename1)
 	var m2 = ProcessFile(filename2)
 	var m = Product(m1, m2)
-	if *output != "" {
+	if *output == "" {
 		fmt.Println("Matrix 1 looks like:")
 		PrintMatrix(m1)
 		fmt.Println("Matrix 2 looks like:")
@@ -178,7 +189,7 @@ func main() {
 		fmt.Println("Result looks like: ")
 		PrintMatrix(m)
 	} else {
-
+		WriteMatrix(m, *output)
 	}
 
 }
