@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"os"
 	"encoding/csv"
+	"math/rand"
 	"io"
 	"strconv"
 	"log"
+	"time"
 )
 
 type matrix struct {
@@ -171,16 +173,57 @@ func WriteMatrix(m matrix, filename string) {
 	}
 }
 
+// Morph is a silly easter egg.
+func Morph(){
+	lines := make([]string, 10)
+	ascii := make([]string, 14)
+	lines[0] = "What is real? How do you define 'real'?"
+	ascii[0] = "         ;;;;;;;;;,    "
+    lines[1] = "The body cannot live without the mind"
+    ascii[4] = "    ;';;@@@@@'@@@@@;;''  "
+    ascii[7] = "     ';;;;;;;;;;;;;;;' "
+    lines[2] = "Unfortunately, no one can be told what the Matrix is. You have to see it for yourself."
+    ascii[8] = "      ;;;;;''''';;;;;  "
+    lines[3] = "Fate, it seems, is not without a sense of irony."
+    ascii[11] = "       ++;;';;;;;;++   "
+    lines[4] = "You've felt it your entire life, that there's something wrong with the world."
+    ascii[1] = "       :;;;;;;;;;;;; "
+    lines[5] = "You take the blue pill - the story ends, you wake up in your bed and believe whatever you want to believe. You take the red pill - you stay in Wonderland and I show you how deep the rabbit-hole goes."
+    ascii[2] = "      `;;;;;;;;;;;;;;  "
+    ascii[5] = "    ,';;;@@@+;;@@@#;;''   "
+    lines[6] = "You can feel it when you go to work... when you go to church... when you pay your taxes."
+    ascii[13] = "     '+++;;;;';;;;++++"
+    ascii[10] = "        +;;;;;;;;;+:"
+    lines[7] = "Have you ever had a dream... that you were so sure was real?"
+    ascii[9] = "       ;;;;;;;;;;;;;;"
+    lines[8] = "They will never be as strong, or as fast, as *you* can be."
+    ascii[3] = "    '+;''@@@#;;@@@@';''"
+    ascii[12] = "      +++;;;''';;;+++ "
+    lines[9] = "What you know, you can't explain. But you feel it."
+    ascii[6] = "     ';;;;;;;;;;;;;;;';"
+    for i := 0; i < len(ascii); i++ {
+    	fmt.Println(ascii[i])
+	}
+	rand.Seed(time.Now().Unix())
+	fmt.Println(lines[rand.Intn(len(lines))])
+}
+
 func main() {
 	var nameptr1 = flag.String("f1", "", "csv file containing matrix 1")
 	var nameptr2 = flag.String("f2", "", "csv file containing matrix 2")
 	var output = flag.String("o", "", "output file (Optional)")
+	var morph = flag.Bool("morph", false, "Red Pill?")
 	flag.Parse()
+	if *morph {
+		Morph()
+		os.Exit(0)
+	}
 	var filename1 = *nameptr1
 	var filename2 = *nameptr2
 	var m1 = ProcessFile(filename1)
 	var m2 = ProcessFile(filename2)
 	var m = Product(m1, m2)
+
 	if *output == "" {
 		fmt.Println("Matrix 1 looks like:")
 		PrintMatrix(m1)
