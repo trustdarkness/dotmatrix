@@ -115,7 +115,7 @@ func TestOutFile(t *testing.T) {
 	rand.Seed(42)
 	someNum := rand.Int()
 	filename := fmt.Sprintf("/tmp/%s.csv", strconv.Itoa(someNum))
-	cmd := exec.Command("go", "run", "dot.go", "-f1", "testdata/2x2.csv", "-f2", "testdata/4x2.csv", "-o", filename)
+	cmd := exec.Command("go", "run", "dot.go", "-a", "testdata/2x2.csv", "-b", "testdata/4x2.csv", "-o", filename)
 	err := cmd.Run()
 	if err != nil {
 		log.Println("", err)

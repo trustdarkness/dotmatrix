@@ -24,36 +24,36 @@ type matrix struct {
 
 // Product computes the Product of two matrices and returns a matrix object.
 // If the matrices cannot be multiplies, an error is printed.
-func Product(m1 matrix, m2 matrix) (matrix) {
-	if (m1.rows != m2.cols) {
+func Product(b matrix, a matrix) (matrix) {
+	if (b.rows != a.cols) {
 		log.Println("The dot product of these matrices is not defined,")
 		log.Println("see https://en.wikipedia.org/wiki/Dot_product for more information.")
 		os.Exit(0)
 	}
 
 	// m1 should be row major and m2 should be column major.
-	if !m1.row_major {
-		m1 = Convert(m1)
+	if !b.row_major {
+		b = Convert(b)
 	}
 
-	if m2.row_major {
-		m2 = Convert(m2)
+	if a.row_major {
+		a = Convert(a)
 	}
 
-	new_len := m1.rows*m2.cols
+	new_len := b.rows*a.cols
 	result_data := make([]int, new_len)
 
 	dstPos := 0
-	for dstYPos := 0; dstYPos < m2.cols; dstYPos++ {
-		for dstXPos := 0; dstXPos < m1.rows; dstXPos++ {
-			for row := 0; row < m1.rows; row++ {
-				for col := 0; col < m1.cols; col++ {
-					m2Pos := 0
+	for dstYPos := 0; dstYPos < a.cols; dstYPos++ {
+		for dstXPos := 0; dstXPos < b.rows; dstXPos++ {
+			for row := 0; row < b.rows; row++ {
+				for col := 0; col < b.cols; col++ {
+					aPos := 0
 					if row == dstXPos {
-						m2Pos = col + (dstXPos * m2.rows)
-						m1Pos := col + (dstYPos * m1.cols)
-						term1 := m1.data[m1Pos]
-						term2 := m2.data[m2Pos]
+						aPos = col + (dstXPos * a.rows)
+						bPos := col + (dstYPos * b.cols)
+						term1 := b.data[bPos]
+						term2 := a.data[aPos]
 						result_data[dstPos] += term1 * term2
 					}
 				}
@@ -62,7 +62,7 @@ func Product(m1 matrix, m2 matrix) (matrix) {
 		}
 	}
 
-	var result = matrix{rows: m1.rows, cols: m2.cols, row_major: true, data: result_data}
+	var result = matrix{rows: b.rows, cols: a.cols, row_major: true, data: result_data}
 	return result
 }
 
@@ -209,26 +209,42 @@ func Morph(){
 }
 
 func main() {
-	var nameptr1 = flag.String("f1", "", "csv file containing matrix 1")
-	var nameptr2 = flag.String("f2", "", "csv file containing matrix 2")
+	var nameptr1 = flag.String("a", "", "csv file containing matrix a")
+	var nameptr2 = flag.String("b", "", "csv file containing matrix b")
 	var output = flag.String("o", "", "output file (Optional)")
 	var morph = flag.Bool("morph", false, "Red Pill?")
+	var hal = flag.Bool("hal", false, "Open the pod bay doors")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Computes the dot product of two matrices c = b*a and returns c.\n")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 	if *morph {
 		Morph()
-		os.Exit(0)
 	}
+	if *hal {
+		fmt.Println("I'm sorry, Dave. I'm afraid I can't do that.")
+	}
+
 	var filename1 = *nameptr1
 	var filename2 = *nameptr2
-	var m1 = ProcessFile(filename1)
-	var m2 = ProcessFile(filename2)
-	var m = Product(m1, m2)
+	if filename1 == "" || filename2 == "" {
+		fmt.Println("I need you to specifiy -a and -b in order to do anything useful.")
+		fmt.Println("Each of these should point to a file that is a csv representation of a matrix")
+		fmt.Println("where one line of the csv is one row of the matrix.")
+		fmt.Println("I will then compute c = ba and give you c.")
+		os.Exit(1)
+	}
+	var b = ProcessFile(filename1)
+	var a = ProcessFile(filename2)
+	var m = Product(b, a)
 
 	if *output == "" {
-		fmt.Println("Matrix 1 looks like:")
-		PrintMatrix(m1)
-		fmt.Println("Matrix 2 looks like:")
-		PrintMatrix(m2)
+		fmt.Println("Matrix b looks like:")
+		PrintMatrix(b)
+		fmt.Println("Matrix a looks like:")
+		PrintMatrix(a)
+		PrintMatrix(a)
 		fmt.Println("Result looks like: ")
 		PrintMatrix(m)
 	} else {
