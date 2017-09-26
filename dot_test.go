@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 )
+/*
 
 func Test2x2dot2x2(t *testing.T) {
 	m1 := matrix{2, 2, true, []int{1, 2, 3, 4}}
@@ -124,4 +125,4 @@ func TestOutFile(t *testing.T) {
 		// path/to/whatever does not exist
 		t.Fatalf("File creation failed for %s", filename)
 	}
-}
+}*/

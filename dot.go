@@ -25,7 +25,7 @@ type matrix struct {
 // Product computes the Product of two matrices and returns a matrix object.
 // If the matrices cannot be multiplies, an error is printed.
 func Product(b matrix, a matrix) (matrix) {
-	if (b.rows != a.cols) {
+	if (a.cols != b.rows) {
 		log.Println("The dot product of these matrices is not defined,")
 		log.Println("see https://en.wikipedia.org/wiki/Dot_product for more information.")
 		os.Exit(0)
