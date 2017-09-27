@@ -10,7 +10,6 @@ import (
 	"os"
 	"strconv"
 )
-/*
 
 func Test2x2dot2x2(t *testing.T) {
 	m1 := matrix{2, 2, true, []int{1, 2, 3, 4}}
@@ -26,13 +25,13 @@ func Test2x2dot2x2(t *testing.T) {
 	}
 }
 
-func Test4x2dot2x4(t *testing.T) {
+func Test2x4dot4x2(t *testing.T) {
 	m1 := matrix{2, 4, true, []int{3, 4, 5, 6, 7, 8, 9, 10}}
 	m2 := matrix{4, 2, true, []int{1, 2, 3, 4, 5, 6, 7, 8}}
 	good := matrix{2, 2, true, []int{82, 100, 146, 180}}
 	product := Product(m1, m2)
 	if !reflect.DeepEqual(product, good) {
-		t.Error("4x2dot2x2 failed")
+		t.Error("2x4dot4x2 failed")
 		t.Error("Expected:")
 		PrintMatrix(good)
 		t.Error("Got:")
@@ -75,6 +74,20 @@ func Test4x4dot4x4andInFiles(t *testing.T) {
 	product := Product(m1, m2)
 	if !reflect.DeepEqual(product, good) {
 		t.Error("4x4dot4x4 failed")
+		t.Error("Expected:")
+		PrintMatrix(good)
+		t.Error("Got:")
+		PrintMatrix(product)
+	}
+}
+
+func Test2x2dot2x4andInFiles(t *testing.T) {
+	a := ProcessFile("testdata/2x2.csv")
+	b := ProcessFile("testdata/2x4.csv")
+	good := ProcessFile("testdata/2x4_out.csv")
+	product := Product(a, b)
+	if !reflect.DeepEqual(product, good) {
+		t.Error("2x2dot2x4 failed")
 		t.Error("Expected:")
 		PrintMatrix(good)
 		t.Error("Got:")
@@ -125,4 +138,4 @@ func TestOutFile(t *testing.T) {
 		// path/to/whatever does not exist
 		t.Fatalf("File creation failed for %s", filename)
 	}
-}*/
+}

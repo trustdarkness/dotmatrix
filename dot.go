@@ -24,7 +24,7 @@ type matrix struct {
 
 // Product computes the Product of two matrices and returns a matrix object.
 // If the matrices cannot be multiplies, an error is printed.
-func Product(b matrix, a matrix) (matrix) {
+func Product(a matrix, b matrix) (matrix) {
 	if (a.cols != b.rows) {
 		log.Println("The dot product of these matrices is not defined,")
 		log.Println("see https://en.wikipedia.org/wiki/Dot_product for more information.")
@@ -32,37 +32,44 @@ func Product(b matrix, a matrix) (matrix) {
 	}
 
 	// m1 should be row major and m2 should be column major.
-	if !b.row_major {
-		b = Convert(b)
-	}
-
-	if a.row_major {
+	if !a.row_major {
 		a = Convert(a)
 	}
 
-	new_len := b.rows*a.cols
+	if b.row_major {
+		b = Convert(b)
+	}
+
+	new_len := a.rows*b.cols
 	result_data := make([]int, new_len)
 
 	dstPos := 0
-	for dstYPos := 0; dstYPos < a.cols; dstYPos++ {
-		for dstXPos := 0; dstXPos < b.rows; dstXPos++ {
-			for row := 0; row < b.rows; row++ {
-				for col := 0; col < b.cols; col++ {
-					aPos := 0
-					if row == dstXPos {
-						aPos = col + (dstXPos * a.rows)
-						bPos := col + (dstYPos * b.cols)
-						term1 := b.data[bPos]
-						term2 := a.data[aPos]
+	bPos := 0
+	for dstYPos := 0; dstYPos < a.rows; {
+		//for dstXPos := 0; dstXPos < b.rows; dstXPos++ {*/
+			//for bcol := 0; bcol < b.cols; bcol++ {
+
+				for acol := 0; acol < a.cols; acol++ {
+					if !(bPos < len(b.data)) {
+						dstYPos++
+						bPos = 0
+						dstPos--
+						break
+					} else {
+						aPos := acol + (dstYPos * a.cols)
+						term1 := a.data[aPos]
+						term2 := b.data[bPos]
 						result_data[dstPos] += term1 * term2
+						bPos++
 					}
 				}
-			}
-			dstPos++
-		}
+				dstPos++
+			//}
+
+		//}
 	}
 
-	var result = matrix{rows: b.rows, cols: a.cols, row_major: true, data: result_data}
+	var result = matrix{rows: a.rows, cols: b.cols, row_major: true, data: result_data}
 	return result
 }
 
@@ -111,7 +118,7 @@ func Convert(m matrix) (matrix) {
 func ProcessFile(file string) matrix {
 	f, err := os.Open(file)
 	if os.IsNotExist(err) {
-		log.Println("%s does not seem to exist.")
+		log.Printf("%s does not seem to exist.", file)
 		os.Exit(1)
 	} else if err != nil {
 		log.Println("", err)
@@ -160,10 +167,10 @@ func WriteMatrix(m matrix, filename string) {
 	defer writer.Flush()
 
 	i := 0
-	for c := 0; c < m.cols; c++ {
+	for r := 0; r < m.rows; r++ {
 		row := make([]string, m.cols)
-		for r := 0; r < m.rows; r++ {
-			row[r] = strconv.Itoa(m.data[i])
+		for c := 0; c < m.cols; c++ {
+			row[c] = strconv.Itoa(m.data[i])
 			i++
 		}
 		err = writer.Write(row)
@@ -243,7 +250,6 @@ func main() {
 		fmt.Println("Matrix b looks like:")
 		PrintMatrix(b)
 		fmt.Println("Matrix a looks like:")
-		PrintMatrix(a)
 		PrintMatrix(a)
 		fmt.Println("Result looks like: ")
 		PrintMatrix(m)
