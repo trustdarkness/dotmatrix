@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 func Test2x2dot2x2(t *testing.T) {
@@ -158,20 +159,24 @@ func TestConvert4(t *testing.T) {
 	}
 }
 
-func Test4x4dot2x2andInFiles(t *testing.T) {
-	cmd := exec.Command("go", "run dot.go -f1 testdata/4x4_1.csv -f2 testdata/2x2.csv")
-	err := cmd.Run()
-	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
-		return
+func Test4x4dot2x2(t *testing.T) {
+	out, err := exec.Command("go", "run", "dot.go", "-a", "testdata/4x4_1.csv",
+		"-b", "testdata/2x2.csv").CombinedOutput()
+	if err != nil {
+		log.Println("", err)
 	}
-	t.Fatalf("process ran with err %v, want exit status 1", err)
+	sout := fmt.Sprintf("%s", out)
+	if !strings.Contains(sout, "not defined") {
+		t.Fatalf("didn't catch incompatible matrix: %s", sout)
+	}
 }
 
 func TestOutFile(t *testing.T) {
 	rand.Seed(42)
 	someNum := rand.Int()
 	filename := fmt.Sprintf("/tmp/%s.csv", strconv.Itoa(someNum))
-	cmd := exec.Command("go", "run", "dot.go", "-a", "testdata/2x2.csv", "-b", "testdata/2x4.csv", "-o", filename)
+	cmd := exec.Command("go", "run", "dot.go", "-a", "testdata/2x2.csv",
+		"-b", "testdata/2x4.csv", "-o", filename)
 	err := cmd.Run()
 	if err != nil {
 		log.Println("", err)
@@ -180,4 +185,17 @@ func TestOutFile(t *testing.T) {
 		// path/to/whatever does not exist
 		t.Fatalf("File creation failed for %s", filename)
 	}
+}
+
+func TestStringInMatrix(t *testing.T) {
+	out, err := exec.Command("go", "run", "dot.go", "-a", "testdata/2x2.csv",
+		"-b", "testdata/bad1.csv").CombinedOutput()
+	if err != nil {
+		log.Println("", err)
+	}
+	sout := fmt.Sprintf("%s", out)
+	if !strings.Contains(sout, "doesn't appear to be an int") {
+		t.Fatalf("didn't catch misformatted matrix: %s", sout)
+	}
+
 }

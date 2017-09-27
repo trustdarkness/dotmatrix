@@ -27,7 +27,7 @@ type matrix struct {
 func Product(a matrix, b matrix) (matrix) {
 	if (a.cols != b.rows) {
 		log.Println("The dot product of these matrices is not defined,")
-		log.Println("see https://en.wikipedia.org/wiki/Dot_product for more information.")
+		log.Print("see https://en.wikipedia.org/wiki/Dot_product.")
 		os.Exit(0)
 	}
 
@@ -46,30 +46,23 @@ func Product(a matrix, b matrix) (matrix) {
 	dstPos := 0
 	bPos := 0
 	for dstYPos := 0; dstYPos < a.rows; {
-		//for dstXPos := 0; dstXPos < b.rows; dstXPos++ {*/
-			//for bcol := 0; bcol < b.cols; bcol++ {
-
-				for acol := 0; acol < a.cols; acol++ {
-					if !(bPos < len(b.data)) {
-						dstYPos++
-						bPos = 0
-						dstPos--
-						break
-					} else {
-						aPos := acol + (dstYPos * a.cols)
-						term1 := a.data[aPos]
-						term2 := b.data[bPos]
-						result_data[dstPos] += term1 * term2
-						bPos++
-					}
-				}
-				dstPos++
-			//}
-
-		//}
+		for acol := 0; acol < a.cols; acol++ {
+			if !(bPos < len(b.data)) {
+				dstYPos++
+				bPos = 0
+				dstPos--
+				break
+			} else {
+				aPos := acol + (dstYPos * a.cols)
+				term1 := a.data[aPos]
+				term2 := b.data[bPos]
+				result_data[dstPos] += term1 * term2
+				bPos++
+			}
+		}
+		dstPos++
 	}
-
-	var result = matrix{rows: a.rows, cols: b.cols, row_major: true, data: result_data}
+	var result = matrix{a.rows,b.cols,true,result_data}
 	return result
 }
 
@@ -110,11 +103,12 @@ func Convert(m matrix) (matrix) {
 			dstPos++
 		}
 	}
-	var ret = matrix{rows:m.rows, cols: m.cols, row_major: !m.row_major, data: result_data}
+	var ret = matrix{m.rows, m.cols,!m.row_major,result_data}
 	return ret
 }
 
-// ProcessFile takes a user provided file name and attempts to build a matrix object from it.
+// ProcessFile takes a user provided file name
+// and attempts to build a matrix object from it.
 func ProcessFile(file string) matrix {
 	f, err := os.Open(file)
 	if os.IsNotExist(err) {
@@ -140,7 +134,8 @@ func ProcessFile(file string) matrix {
 		for i := 0; i < cols; i++ {
 			s, err := strconv.Atoi(line[i])
 			if err != nil {
-				log.Println("%s doesn't appear to be an int: %s", line[i], err)
+				log.Printf("%s doesn't appear to be an int: %s\n", line[i], err)
+				log.Println("Check the format of your matrix")
 				os.Exit(1)
 			}
 			data = append(data, s)
@@ -222,7 +217,8 @@ func main() {
 	var morph = flag.Bool("morph", false, "Red Pill?")
 	var hal = flag.Bool("hal", false, "Open the pod bay doors")
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Computes the dot product of two matrices c = a*b and returns c.\n")
+		fmt.Fprintf(os.Stderr,
+			"Computes and returns the dot product of two matrices\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
