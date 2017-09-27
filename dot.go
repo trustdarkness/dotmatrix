@@ -222,7 +222,7 @@ func main() {
 	var morph = flag.Bool("morph", false, "Red Pill?")
 	var hal = flag.Bool("hal", false, "Open the pod bay doors")
 	flag.Usage = func() {
-		fmt.Fprintf(os.Stderr, "Computes the dot product of two matrices c = b*a and returns c.\n")
+		fmt.Fprintf(os.Stderr, "Computes the dot product of two matrices c = a*b and returns c.\n")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -239,7 +239,7 @@ func main() {
 		fmt.Println("I need you to specifiy -a and -b in order to do anything useful.")
 		fmt.Println("Each of these should point to a file that is a csv representation of a matrix")
 		fmt.Println("where one line of the csv is one row of the matrix.")
-		fmt.Println("I will then compute c = ba and give you c.")
+		fmt.Println("I will then compute c = a*b and give you c.")
 		os.Exit(1)
 	}
 	var b = ProcessFile(filename1)
