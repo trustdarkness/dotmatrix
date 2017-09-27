@@ -13,9 +13,9 @@ import (
 )
 
 func Test2x2dot2x2(t *testing.T) {
-	m1 := matrix{2, 2, true, []int{1, 2, 3, 4}}
-	m2 := matrix{2, 2, true, []int{3, 4, 5, 6}}
-	good := matrix{2, 2, true, []int{13, 16, 29, 36}}
+	m1 := Matrix{2, 2, true, []int{1, 2, 3, 4}}
+	m2 := Matrix{2, 2, true, []int{3, 4, 5, 6}}
+	good := Matrix{2, 2, true, []int{13, 16, 29, 36}}
 	product := Product(m1, m2)
 	if !reflect.DeepEqual(product, good) {
 		t.Error("2x2dot2x2 failed")
@@ -27,9 +27,9 @@ func Test2x2dot2x2(t *testing.T) {
 }
 
 func Test2x4dot4x2(t *testing.T) {
-	m1 := matrix{2, 4, true, []int{3, 4, 5, 6, 7, 8, 9, 10}}
-	m2 := matrix{4, 2, true, []int{1, 2, 3, 4, 5, 6, 7, 8}}
-	good := matrix{2, 2, true, []int{82, 100, 146, 180}}
+	m1 := Matrix{2, 4, true, []int{3, 4, 5, 6, 7, 8, 9, 10}}
+	m2 := Matrix{4, 2, true, []int{1, 2, 3, 4, 5, 6, 7, 8}}
+	good := Matrix{2, 2, true, []int{82, 100, 146, 180}}
 	product := Product(m1, m2)
 	if !reflect.DeepEqual(product, good) {
 		t.Error("2x4dot4x2 failed")
@@ -41,7 +41,7 @@ func Test2x4dot4x2(t *testing.T) {
 }
 
 func Test1x9dot9x1(t *testing.T) {
-	good := matrix{1, 1, true, []int{237}}
+	good := Matrix{1, 1, true, []int{237}}
 	m1 := ProcessFile("testdata/1x9.csv")
 	m2 := ProcessFile("testdata/9x1.csv")
 	product := Product(m1, m2)
@@ -99,7 +99,7 @@ func Test2x2dot2x4andInFiles(t *testing.T) {
 func Test1x1dot1x1andInFiles(t *testing.T) {
 	a := ProcessFile("testdata/1x1_1.csv")
 	b := ProcessFile("testdata/1x1_2.csv")
-	good := matrix{1, 1, true, []int{15}}
+	good := Matrix{1, 1, true, []int{15}}
 	product := Product(a, b)
 	if !reflect.DeepEqual(product, good) {
 		t.Error("2x2dot2x4 failed")
@@ -113,7 +113,7 @@ func Test1x1dot1x1andInFiles(t *testing.T) {
 func Test2x3dot3x2andInFiles(t *testing.T) {
 	a := ProcessFile("testdata/2x3.csv")
 	b := ProcessFile("testdata/3x2.csv")
-	good := matrix{2, 2, true, []int{58, 64, 139, 154}}
+	good := Matrix{2, 2, true, []int{58, 64, 139, 154}}
 	product := Product(a, b)
 	if !reflect.DeepEqual(product, good) {
 		t.Error("2x2dot2x4 failed")
@@ -125,9 +125,9 @@ func Test2x3dot3x2andInFiles(t *testing.T) {
 }
 
 func Test1x3dot3x4(t *testing.T) {
-	a := matrix{1, 3, true, []int{3, 4, 2}}
-	b := matrix{3, 4, true, []int{13, 9, 7, 15, 8, 7, 4, 6, 6, 4, 0, 3}}
-	good := matrix{1, 4, true, []int{83, 63, 37, 75}}
+	a := Matrix{1, 3, true, []int{3, 4, 2}}
+	b := Matrix{3, 4, true, []int{13, 9, 7, 15, 8, 7, 4, 6, 6, 4, 0, 3}}
+	good := Matrix{1, 4, true, []int{83, 63, 37, 75}}
 	product := Product(a, b)
 	if !reflect.DeepEqual(product, good) {
 		t.Error("2x2dot2x4 failed")
@@ -139,23 +139,23 @@ func Test1x3dot3x4(t *testing.T) {
 }
 
 func TestConvert4(t *testing.T) {
-	m_r := matrix{2, 2, true, []int{3, 4, 5, 6}}
-	m_c := matrix{2, 2, false, []int{3, 5, 4, 6}}
-	m2_c := Convert(m_r)
-	m2_r := Convert(m_c)
-	if !reflect.DeepEqual(m_r, m2_r) {
+	mR := Matrix{2, 2, true, []int{3, 4, 5, 6}}
+	mC := Matrix{2, 2, false, []int{3, 5, 4, 6}}
+	m2C := Convert(mR)
+	m2R := Convert(mC)
+	if !reflect.DeepEqual(mR, m2R) {
 		t.Error("Converting column to row failed")
 		t.Error("Expected:")
-		PrintMatrix(m_r)
+		PrintMatrix(mR)
 		t.Error("Got:")
-		PrintMatrix(m2_r)
+		PrintMatrix(m2R)
 	}
-	if !reflect.DeepEqual(m_c, m2_c) {
+	if !reflect.DeepEqual(mC, m2C) {
 		t.Error("Converting row to column failed")
 		t.Error("Expected:")
-		PrintMatrix(m_c)
+		PrintMatrix(mC)
 		t.Error("Got:")
-		PrintMatrix(m2_c)
+		PrintMatrix(m2C)
 	}
 }
 
@@ -167,7 +167,7 @@ func Test4x4dot2x2(t *testing.T) {
 	}
 	sout := fmt.Sprintf("%s", out)
 	if !strings.Contains(sout, "not defined") {
-		t.Fatalf("didn't catch incompatible matrix: %s", sout)
+		t.Fatalf("didn't catch incompatible Matrix: %s", sout)
 	}
 }
 
@@ -195,7 +195,7 @@ func TestStringInMatrix(t *testing.T) {
 	}
 	sout := fmt.Sprintf("%s", out)
 	if !strings.Contains(sout, "doesn't appear to be an int") {
-		t.Fatalf("didn't catch misformatted matrix: %s", sout)
+		t.Fatalf("didn't catch misformatted Matrix: %s", sout)
 	}
 }
 
@@ -208,6 +208,6 @@ func TestBadLineLengths(t *testing.T) {
 	sout := fmt.Sprintf("%s", out)
 	if !strings.Contains(sout, "doesn't appear to be valid") &&
 		!strings.Contains(sout, "wrong number of fields") {
-		t.Fatalf("didn't catch misformatted matrix: %s", sout)
+		t.Fatalf("didn't catch misformatted Matrix: %s", sout)
 	}
 }

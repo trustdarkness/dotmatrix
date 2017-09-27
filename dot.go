@@ -15,16 +15,18 @@ import (
 	"time"
 )
 
-type matrix struct {
-	rows      int
-	cols      int
-	row_major bool
-	data      []int
+// Matrix is a struct representation of a matrix with an underlying
+// array of int in either row major or column major ordering
+type Matrix struct {
+	rows     int
+	cols     int
+	rowMajor bool
+	data     []int
 }
 
-// Product computes the Product of two matrices and returns a matrix object.
+// Product computes the Product of two matrices and returns a Matrix object.
 // If the matrices cannot be multiplies, an error is printed.
-func Product(a matrix, b matrix) matrix {
+func Product(a Matrix, b Matrix) Matrix {
 	if a.cols != b.rows {
 		log.Println("The dot product of these matrices is not defined,")
 		log.Print("see https://en.wikipedia.org/wiki/Dot_product.")
@@ -32,16 +34,16 @@ func Product(a matrix, b matrix) matrix {
 	}
 
 	// m1 should be row major and m2 should be column major.
-	if !a.row_major {
+	if !a.rowMajor {
 		a = Convert(a)
 	}
 
-	if b.row_major {
+	if b.rowMajor {
 		b = Convert(b)
 	}
 
-	new_len := a.rows * b.cols
-	result_data := make([]int, new_len)
+	newLen := a.rows * b.cols
+	resultData := make([]int, newLen)
 
 	dstPos := 0
 	bPos := 0
@@ -56,20 +58,20 @@ func Product(a matrix, b matrix) matrix {
 				aPos := acol + (dstYPos * a.cols)
 				term1 := a.data[aPos]
 				term2 := b.data[bPos]
-				result_data[dstPos] += term1 * term2
+				resultData[dstPos] += term1 * term2
 				bPos++
 			}
 		}
 		dstPos++
 	}
-	var result = matrix{a.rows, b.cols, true, result_data}
+	var result = Matrix{a.rows, b.cols, true, resultData}
 	return result
 }
 
-// PrintMatrix prints a matrix to the console.
+// PrintMatrix prints a Matrix to the console.
 // Depends on PrintRowMajorMatrix
-func PrintMatrix(m matrix) {
-	if !m.row_major {
+func PrintMatrix(m Matrix) {
+	if !m.rowMajor {
 		var mrm = Convert(m)
 		PrintRowMajorMatrix(mrm)
 	} else {
@@ -77,9 +79,9 @@ func PrintMatrix(m matrix) {
 	}
 }
 
-// PrintRowMajorMatrix prints a row major matrix to the console.
+// PrintRowMajorMatrix prints a row major Matrix to the console.
 // This is called by Print Matrix.
-func PrintRowMajorMatrix(m matrix) {
+func PrintRowMajorMatrix(m Matrix) {
 	i := 0
 	for r := 0; r < m.rows; r++ {
 		fmt.Printf("[ ")
@@ -91,25 +93,25 @@ func PrintRowMajorMatrix(m matrix) {
 	}
 }
 
-// Convert converts a matrix between row_major and column major.
-func Convert(m matrix) matrix {
-	var result_data = make([]int, len(m.data))
+// Convert converts a Matrix between rowMajor and column major.
+func Convert(m Matrix) Matrix {
+	var resultData = make([]int, len(m.data))
 	dstPos := 0
 	for col := 0; col < m.cols; col++ {
 		srcPos := 0
 		for row := 0; row < m.rows; row++ {
 			srcPos = row*m.cols + col
-			result_data[dstPos] = m.data[srcPos]
+			resultData[dstPos] = m.data[srcPos]
 			dstPos++
 		}
 	}
-	var ret = matrix{m.rows, m.cols, !m.row_major, result_data}
+	var ret = Matrix{m.rows, m.cols, !m.rowMajor, resultData}
 	return ret
 }
 
 // ProcessFile takes a user provided file name
-// and attempts to build a matrix object from it.
-func ProcessFile(file string) matrix {
+// and attempts to build a Matrix object from it.
+func ProcessFile(file string) Matrix {
 	f, err := os.Open(file)
 	if os.IsNotExist(err) {
 		log.Printf("%s does not seem to exist.", file)
@@ -135,21 +137,21 @@ func ProcessFile(file string) matrix {
 			s, err := strconv.Atoi(line[i])
 			if err != nil {
 				log.Printf("%s doesn't appear to be an int: %s\n", line[i], err)
-				log.Println("Check the format of your matrix")
+				log.Println("Check the format of your Matrix")
 				os.Exit(1)
 			}
 			data = append(data, s)
 		}
 		rows++
 	}
-	var m = matrix{rows: rows, cols: cols, row_major: true, data: data}
+	var m = Matrix{rows: rows, cols: cols, rowMajor: true, data: data}
 	SanityCheck(m, file)
 	return m
 }
 
-// Sanity Check runs checks to make sure our matrix has the right number
+// SanityCheck runs checks to make sure our Matrix has the right number
 // of elements, etc.
-func SanityCheck(m matrix, name string) {
+func SanityCheck(m Matrix, name string) {
 	// length of m.data should be rows * cols
 	length := m.rows * m.cols
 	if length != len(m.data) {
@@ -158,13 +160,13 @@ func SanityCheck(m matrix, name string) {
 	}
 }
 
-// Write matrix writes the provided matrix to a csv file.
-func WriteMatrix(m matrix, filename string) {
+// WriteMatrix writes the provided Matrix to a csv file.
+func WriteMatrix(m Matrix, filename string) {
 	f, err := os.Create(filename)
 	if err != nil {
 		log.Println("", err)
 		log.Println("I couldn't write the file because of the above error.")
-		fmt.Println("The result matrix looks like:")
+		fmt.Println("The result Matrix looks like:")
 		PrintMatrix(m)
 		os.Exit(1)
 	}
@@ -223,8 +225,8 @@ func Morph() {
 }
 
 func main() {
-	var nameptr1 = flag.String("a", "", "csv file containing matrix a")
-	var nameptr2 = flag.String("b", "", "csv file containing matrix b")
+	var nameptr1 = flag.String("a", "", "csv file containing Matrix a")
+	var nameptr2 = flag.String("b", "", "csv file containing Matrix b")
 	var output = flag.String("o", "", "output file (Optional)")
 	var morph = flag.Bool("morph", false, "Red Pill?")
 	var hal = flag.Bool("hal", false, "Open the pod bay doors")
@@ -245,8 +247,8 @@ func main() {
 	var filename2 = *nameptr2
 	if filename1 == "" || filename2 == "" {
 		fmt.Println("I need you to specifiy -a and -b in order to do anything useful.")
-		fmt.Println("Each of these should point to a file that is a csv representation of a matrix")
-		fmt.Println("where one line of the csv is one row of the matrix.")
+		fmt.Println("Each of these should point to a file that is a csv representation of a Matrix")
+		fmt.Println("where one line of the csv is one row of the Matrix.")
 		fmt.Println("I will then compute c = a*b and give you c.")
 		os.Exit(1)
 	}
