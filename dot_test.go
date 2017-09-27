@@ -197,5 +197,17 @@ func TestStringInMatrix(t *testing.T) {
 	if !strings.Contains(sout, "doesn't appear to be an int") {
 		t.Fatalf("didn't catch misformatted matrix: %s", sout)
 	}
+}
 
+func TestBadLineLengths(t *testing.T) {
+	out, err := exec.Command("go", "run", "dot.go", "-a", "testdata/bad2.csv",
+		"-b", "testdata/2x2.csv").CombinedOutput()
+	if err != nil {
+		log.Println("", err)
+	}
+	sout := fmt.Sprintf("%s", out)
+	if !strings.Contains(sout, "doesn't appear to be valid") &&
+		!strings.Contains(sout, "wrong number of fields") {
+		t.Fatalf("didn't catch misformatted matrix: %s", sout)
+	}
 }

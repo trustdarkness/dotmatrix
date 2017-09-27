@@ -143,7 +143,19 @@ func ProcessFile(file string) matrix {
 		rows++
 	}
 	var m = matrix{rows: rows, cols: cols, row_major: true, data: data}
+	SanityCheck(m, file)
   	return m
+}
+
+// Sanity Check runs checks to make sure our matrix has the right number
+// of elements, etc.
+func SanityCheck(m matrix, name string) {
+	// length of m.data should be rows * cols
+	length := m.rows * m.cols
+	if length != len(m.data) {
+		log.Printf("Matrix %s doesn't appear to be valid\n", name)
+		os.Exit(1)
+	}
 }
 
 // Write matrix writes the provided matrix to a csv file.
