@@ -4,28 +4,28 @@
 package main
 
 import (
+	"encoding/csv"
 	"flag"
 	"fmt"
-	"os"
-	"encoding/csv"
-	"math/rand"
 	"io"
-	"strconv"
 	"log"
+	"math/rand"
+	"os"
+	"strconv"
 	"time"
 )
 
 type matrix struct {
-	rows int
-	cols int
+	rows      int
+	cols      int
 	row_major bool
-    data []int
+	data      []int
 }
 
 // Product computes the Product of two matrices and returns a matrix object.
 // If the matrices cannot be multiplies, an error is printed.
-func Product(a matrix, b matrix) (matrix) {
-	if (a.cols != b.rows) {
+func Product(a matrix, b matrix) matrix {
+	if a.cols != b.rows {
 		log.Println("The dot product of these matrices is not defined,")
 		log.Print("see https://en.wikipedia.org/wiki/Dot_product.")
 		os.Exit(0)
@@ -40,7 +40,7 @@ func Product(a matrix, b matrix) (matrix) {
 		b = Convert(b)
 	}
 
-	new_len := a.rows*b.cols
+	new_len := a.rows * b.cols
 	result_data := make([]int, new_len)
 
 	dstPos := 0
@@ -62,14 +62,14 @@ func Product(a matrix, b matrix) (matrix) {
 		}
 		dstPos++
 	}
-	var result = matrix{a.rows,b.cols,true,result_data}
+	var result = matrix{a.rows, b.cols, true, result_data}
 	return result
 }
 
 // PrintMatrix prints a matrix to the console.
 // Depends on PrintRowMajorMatrix
-func PrintMatrix (m matrix) {
-	if (!m.row_major) {
+func PrintMatrix(m matrix) {
+	if !m.row_major {
 		var mrm = Convert(m)
 		PrintRowMajorMatrix(mrm)
 	} else {
@@ -84,26 +84,26 @@ func PrintRowMajorMatrix(m matrix) {
 	for r := 0; r < m.rows; r++ {
 		fmt.Printf("[ ")
 		for c := 0; c < m.cols; c++ {
-		  fmt.Printf("%2d ", m.data[i])
-		  i++
+			fmt.Printf("%2d ", m.data[i])
+			i++
 		}
 		fmt.Printf("]\n")
 	}
 }
 
 // Convert converts a matrix between row_major and column major.
-func Convert(m matrix) (matrix) {
-	var result_data = make([]int,len(m.data))
+func Convert(m matrix) matrix {
+	var result_data = make([]int, len(m.data))
 	dstPos := 0
 	for col := 0; col < m.cols; col++ {
 		srcPos := 0
 		for row := 0; row < m.rows; row++ {
-			srcPos = row * m.cols + col
+			srcPos = row*m.cols + col
 			result_data[dstPos] = m.data[srcPos]
 			dstPos++
 		}
 	}
-	var ret = matrix{m.rows, m.cols,!m.row_major,result_data}
+	var ret = matrix{m.rows, m.cols, !m.row_major, result_data}
 	return ret
 }
 
@@ -144,7 +144,7 @@ func ProcessFile(file string) matrix {
 	}
 	var m = matrix{rows: rows, cols: cols, row_major: true, data: data}
 	SanityCheck(m, file)
-  	return m
+	return m
 }
 
 // Sanity Check runs checks to make sure our matrix has the right number
@@ -188,35 +188,35 @@ func WriteMatrix(m matrix, filename string) {
 }
 
 // Morph is a silly easter egg.
-func Morph(){
+func Morph() {
 	lines := make([]string, 10)
 	ascii := make([]string, 14)
 	lines[0] = "What is real? How do you define 'real'?"
 	ascii[0] = "         ;;;;;;;;;,    "
-    lines[1] = "The body cannot live without the mind"
-    ascii[4] = "    ;';;@@@@@'@@@@@;;''  "
-    ascii[7] = "     ';;;;;;;;;;;;;;;' "
-    lines[2] = "Unfortunately, no one can be told what the Matrix is. You have to see it for yourself."
-    ascii[8] = "      ;;;;;''''';;;;;  "
-    lines[3] = "Fate, it seems, is not without a sense of irony."
-    ascii[11] = "       ++;;';;;;;;++   "
-    lines[4] = "You've felt it your entire life, that there's something wrong with the world."
-    ascii[1] = "       :;;;;;;;;;;;; "
-    lines[5] = "You take the blue pill - the story ends, you wake up in your bed and believe whatever you want to believe. You take the red pill - you stay in Wonderland and I show you how deep the rabbit-hole goes."
-    ascii[2] = "      `;;;;;;;;;;;;;;  "
-    ascii[5] = "    ,';;;@@@+;;@@@#;;''   "
-    lines[6] = "You can feel it when you go to work... when you go to church... when you pay your taxes."
-    ascii[13] = "     '+++;;;;';;;;++++"
-    ascii[10] = "        +;;;;;;;;;+:"
-    lines[7] = "Have you ever had a dream... that you were so sure was real?"
-    ascii[9] = "       ;;;;;;;;;;;;;;"
-    lines[8] = "They will never be as strong, or as fast, as *you* can be."
-    ascii[3] = "    '+;''@@@#;;@@@@';''"
-    ascii[12] = "      +++;;;''';;;+++ "
-    lines[9] = "What you know, you can't explain. But you feel it."
-    ascii[6] = "     ';;;;;;;;;;;;;;;';"
-    for i := 0; i < len(ascii); i++ {
-    	fmt.Println(ascii[i])
+	lines[1] = "The body cannot live without the mind"
+	ascii[4] = "    ;';;@@@@@'@@@@@;;''  "
+	ascii[7] = "     ';;;;;;;;;;;;;;;' "
+	lines[2] = "Unfortunately, no one can be told what the Matrix is. You have to see it for yourself."
+	ascii[8] = "      ;;;;;''''';;;;;  "
+	lines[3] = "Fate, it seems, is not without a sense of irony."
+	ascii[11] = "       ++;;';;;;;;++   "
+	lines[4] = "You've felt it your entire life, that there's something wrong with the world."
+	ascii[1] = "       :;;;;;;;;;;;; "
+	lines[5] = "You take the blue pill - the story ends, you wake up in your bed and believe whatever you want to believe. You take the red pill - you stay in Wonderland and I show you how deep the rabbit-hole goes."
+	ascii[2] = "      `;;;;;;;;;;;;;;  "
+	ascii[5] = "    ,';;;@@@+;;@@@#;;''   "
+	lines[6] = "You can feel it when you go to work... when you go to church... when you pay your taxes."
+	ascii[13] = "     '+++;;;;';;;;++++"
+	ascii[10] = "        +;;;;;;;;;+:"
+	lines[7] = "Have you ever had a dream... that you were so sure was real?"
+	ascii[9] = "       ;;;;;;;;;;;;;;"
+	lines[8] = "They will never be as strong, or as fast, as *you* can be."
+	ascii[3] = "    '+;''@@@#;;@@@@';''"
+	ascii[12] = "      +++;;;''';;;+++ "
+	lines[9] = "What you know, you can't explain. But you feel it."
+	ascii[6] = "     ';;;;;;;;;;;;;;;';"
+	for i := 0; i < len(ascii); i++ {
+		fmt.Println(ascii[i])
 	}
 	rand.Seed(time.Now().Unix())
 	fmt.Println(lines[rand.Intn(len(lines))])
@@ -266,5 +266,3 @@ func main() {
 	}
 
 }
-
-
