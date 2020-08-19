@@ -1,5 +1,5 @@
 # dotmatrix
-A simple go program by Mike Thompson
+A simple go program.
 
 Package dot computes the dot product of two matrices. It can be run interactively on the console or scripted using csv files for input and output.
 
